@@ -1,25 +1,186 @@
-import { CalculateMetadataFunction, Composition } from "remotion";
+import {
+  AbsoluteFill,
+  Composition,
+  Easing,
+  interpolate,
+  OffthreadVideo,
+  Sequence,
+  staticFile,
+  useCurrentFrame,
+} from "remotion";
 
-type Props = {};
+export const FPS = 30;
+export const DURATION_IN_FRAMES = 2264;
 
-const calculateMetadata: CalculateMetadataFunction<Props> = () => {
-  return {};
+// Timestamps (in frames) of detected scene cuts in the source footage.
+// Used to drive a "punch in" zoom on every cut for editing energy.
+const CUT_FRAMES = [
+  109, 195, 267, 337, 398, 518, 620, 645, 677, 880, 916, 941, 1001, 1061,
+  1146, 1207, 1314, 1357, 1401, 1485, 1631, 1704, 1772, 1823, 1869,
+];
+
+const useCutPunchScale = (frame: number) => {
+  let lastCut = 0;
+  for (const cut of CUT_FRAMES) {
+    if (cut <= frame) {
+      lastCut = cut;
+    } else {
+      break;
+    }
+  }
+  const framesSinceCut = frame - lastCut;
+  return interpolate(framesSinceCut, [0, 14], [1.045, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
+  });
+};
+
+const VideoLayer: React.FC = () => {
+  const frame = useCurrentFrame();
+  const scale = useCutPunchScale(frame);
+
+  return (
+    <AbsoluteFill style={{ backgroundColor: "black" }}>
+      <AbsoluteFill
+        style={{
+          transform: `scale(${scale})`,
+          filter: "contrast(1.08) saturate(1.18)",
+        }}
+      >
+        <OffthreadVideo src={staticFile("source.mp4")} />
+      </AbsoluteFill>
+      <AbsoluteFill
+        style={{
+          boxShadow: "inset 0 0 240px 70px rgba(0,0,0,0.45)",
+          pointerEvents: "none",
+        }}
+      />
+    </AbsoluteFill>
+  );
+};
+
+const HOOK_DURATION = 66;
+
+const HookText: React.FC = () => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(
+    frame,
+    [0, 10, HOOK_DURATION - 15, HOOK_DURATION],
+    [0, 1, 1, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+  const scale = interpolate(frame, [0, 10], [0.85, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.back(1.6)),
+  });
+
+  return (
+    <AbsoluteFill
+      style={{ justifyContent: "flex-start", alignItems: "center" }}
+    >
+      <div
+        style={{
+          marginTop: 160,
+          opacity,
+          transform: `scale(${scale})`,
+          fontFamily: "Helvetica, Arial, sans-serif",
+          fontWeight: 800,
+          fontSize: 64,
+          lineHeight: 1.15,
+          color: "white",
+          textAlign: "center",
+          textShadow: "0 4px 24px rgba(0,0,0,0.6)",
+          padding: "0 60px",
+        }}
+      >
+        POV: you survive
+        <br />
+        90 minutes of{" "}
+        <span style={{ color: "#ff5fa2" }}>hot mobility</span> 🔥
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+const CTA_DURATION = 95;
+
+const CtaText: React.FC = () => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(frame, [0, 20], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const y = interpolate(frame, [0, 20], [30, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
+  });
+  const pulse = 1 + Math.sin(frame / 8) * 0.03;
+
+  return (
+    <AbsoluteFill
+      style={{
+        justifyContent: "flex-end",
+        alignItems: "center",
+        paddingBottom: 210,
+      }}
+    >
+      <div
+        style={{
+          opacity,
+          transform: `translateY(${y}px) scale(${pulse})`,
+          background: "rgba(0,0,0,0.55)",
+          borderRadius: 999,
+          padding: "20px 40px",
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+        }}
+      >
+        <span style={{ fontSize: 34 }}>📍</span>
+        <span
+          style={{
+            fontFamily: "Helvetica, Arial, sans-serif",
+            fontWeight: 800,
+            fontSize: 34,
+            color: "white",
+          }}
+        >
+          Book your class — link in bio
+        </span>
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+export const TikTokPromo: React.FC = () => {
+  return (
+    <AbsoluteFill style={{ backgroundColor: "black" }}>
+      <VideoLayer />
+      <Sequence durationInFrames={HOOK_DURATION}>
+        <HookText />
+      </Sequence>
+      <Sequence
+        from={DURATION_IN_FRAMES - CTA_DURATION}
+        durationInFrames={CTA_DURATION}
+      >
+        <CtaText />
+      </Sequence>
+    </AbsoluteFill>
+  );
 };
 
 export const MyComposition = () => {
   return (
     <Composition
-      id="MyComp"
-      component={MyComponent}
-      durationInFrames={60}
-      fps={30}
-      width={1280}
-      height={720}
-      calculateMetadata={calculateMetadata}
+      id="TikTokPromo"
+      component={TikTokPromo}
+      durationInFrames={DURATION_IN_FRAMES}
+      fps={FPS}
+      width={1080}
+      height={1920}
     />
   );
-};
-
-export const MyComponent: React.FC<Props> = () => {
-  return null;
 };
