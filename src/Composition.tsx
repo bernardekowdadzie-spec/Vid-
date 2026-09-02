@@ -14,28 +14,20 @@ import { duckCurve } from "./duckCurve";
 export const FPS = 30;
 export const DURATION_IN_FRAMES = 2264;
 
-// Beat grid of the smooth-jazz bed (86 BPM, see the track's own bar
-// structure) — the punch-in zoom below snaps on every beat instead of the
-// footage's own cuts, so the edit reads as "cut to the beat" of the music.
-const MUSIC_BPM = 86;
-const BEATS_PER_BAR = 4;
-const FRAMES_PER_BEAT = (60 / MUSIC_BPM) * FPS;
-
-const useBeatPunchScale = (frame: number) => {
-  const beatIndex = Math.floor(frame / FRAMES_PER_BEAT);
-  const framesSinceBeat = frame - beatIndex * FRAMES_PER_BEAT;
-  const isDownbeat = beatIndex % BEATS_PER_BAR === 0;
-  const peak = isDownbeat ? 1.065 : 1.03;
-  return interpolate(framesSinceBeat, [0, 14], [peak, 1], {
+// A single, slow, continuous drift across the whole clip — the kind of
+// near-imperceptible Ken Burns motion used in professional edits, rather
+// than a per-beat punch that reads as an amateur "bounce."
+const useSlowDrift = (frame: number) => {
+  return interpolate(frame, [0, DURATION_IN_FRAMES], [1, 1.055], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
-    easing: Easing.out(Easing.cubic),
+    easing: Easing.inOut(Easing.ease),
   });
 };
 
 const VideoLayer: React.FC = () => {
   const frame = useCurrentFrame();
-  const scale = useBeatPunchScale(frame);
+  const scale = useSlowDrift(frame);
 
   return (
     <AbsoluteFill style={{ backgroundColor: "black" }}>
