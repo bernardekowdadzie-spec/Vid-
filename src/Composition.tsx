@@ -1,5 +1,6 @@
 import {
   AbsoluteFill,
+  Audio,
   Composition,
   Easing,
   interpolate,
@@ -8,6 +9,7 @@ import {
   staticFile,
   useCurrentFrame,
 } from "remotion";
+import { duckCurve } from "./duckCurve";
 
 export const FPS = 30;
 export const DURATION_IN_FRAMES = 2264;
@@ -159,6 +161,10 @@ export const TikTokPromo: React.FC = () => {
   return (
     <AbsoluteFill style={{ backgroundColor: "black" }}>
       <VideoLayer />
+      <Audio
+        src={staticFile("jazz-bed.m4a")}
+        volume={(frame) => duckCurve[frame] ?? 0}
+      />
       <Sequence durationInFrames={HOOK_DURATION}>
         <HookText />
       </Sequence>
