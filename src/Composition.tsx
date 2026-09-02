@@ -14,24 +14,19 @@ import { duckCurve } from "./duckCurve";
 export const FPS = 30;
 export const DURATION_IN_FRAMES = 2264;
 
-// Timestamps (in frames) of detected scene cuts in the source footage.
-// Used to drive a "punch in" zoom on every cut for editing energy.
-const CUT_FRAMES = [
-  109, 195, 267, 337, 398, 518, 620, 645, 677, 880, 916, 941, 1001, 1061,
-  1146, 1207, 1314, 1357, 1401, 1485, 1631, 1704, 1772, 1823, 1869,
-];
+// Beat grid of the smooth-jazz bed (86 BPM, see the track's own bar
+// structure) — the punch-in zoom below snaps on every beat instead of the
+// footage's own cuts, so the edit reads as "cut to the beat" of the music.
+const MUSIC_BPM = 86;
+const BEATS_PER_BAR = 4;
+const FRAMES_PER_BEAT = (60 / MUSIC_BPM) * FPS;
 
-const useCutPunchScale = (frame: number) => {
-  let lastCut = 0;
-  for (const cut of CUT_FRAMES) {
-    if (cut <= frame) {
-      lastCut = cut;
-    } else {
-      break;
-    }
-  }
-  const framesSinceCut = frame - lastCut;
-  return interpolate(framesSinceCut, [0, 14], [1.045, 1], {
+const useBeatPunchScale = (frame: number) => {
+  const beatIndex = Math.floor(frame / FRAMES_PER_BEAT);
+  const framesSinceBeat = frame - beatIndex * FRAMES_PER_BEAT;
+  const isDownbeat = beatIndex % BEATS_PER_BAR === 0;
+  const peak = isDownbeat ? 1.065 : 1.03;
+  return interpolate(framesSinceBeat, [0, 14], [peak, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.out(Easing.cubic),
@@ -40,7 +35,7 @@ const useCutPunchScale = (frame: number) => {
 
 const VideoLayer: React.FC = () => {
   const frame = useCurrentFrame();
-  const scale = useCutPunchScale(frame);
+  const scale = useBeatPunchScale(frame);
 
   return (
     <AbsoluteFill style={{ backgroundColor: "black" }}>
