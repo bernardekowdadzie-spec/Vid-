@@ -1,0 +1,10 @@
+requests>=2.31
+beautifulsoup4>=4.12
+lxml>=5.0
+PyYAML>=6.0
+SpeechRecognition>=3.10
+pyttsx3>=2.90
+PyAudio>=0.2.13
+anthropic>=0.39
+python-dotenv>=1.0
+pytest>=8.0

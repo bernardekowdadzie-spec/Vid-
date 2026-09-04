@@ -1,0 +1,64 @@
+# Copy this file to config.yaml and adjust. config.yaml is gitignored so
+# your personal settings never get committed.
+
+wake_phrase: "jarvis wake up"
+sleep_phrase: "jarvis go to sleep"
+assistant_name: "Javis"
+
+voice:
+  tts_rate: 175
+  listen_timeout_seconds: 8
+  phrase_time_limit_seconds: 6
+  # If true, every command needs the wake phrase said first (safer, avoids
+  # accidental triggers from background noise/TV). If false, once awake
+  # Javis keeps taking commands until you say the sleep phrase.
+  require_wake_word_each_time: false
+
+anthropic:
+  # Set ANTHROPIC_API_KEY in your .env / environment - do not put the key here.
+  model: "claude-sonnet-5"
+
+sources:
+  fca:
+    name: "Financial Conduct Authority"
+    enabled: true
+    listing_url: "https://www.fca.org.uk/careers/current-vacancies"
+    # PLACEHOLDER SELECTORS - not verified against the live site (this repo
+    # was built in a sandbox with no network access to fca.org.uk). Run
+    # `python main.py inspect fca` and update these before trusting results.
+    selectors:
+      job_card: "a[href*='vacanc'], a[href*='job']"
+      title: null          # null = use the link's own text as the title
+      location: null       # CSS selector for a location element near the card, if any
+      link_is_absolute: false
+      base_url: "https://www.fca.org.uk"
+  boe:
+    name: "Bank of England"
+    enabled: true
+    listing_url: "https://www.bankofengland.co.uk/careers/current-vacancies"
+    # PLACEHOLDER SELECTORS - see note above; verify with `inspect boe`.
+    selectors:
+      job_card: "a[href*='vacanc'], a[href*='job']"
+      title: null
+      location: null
+      link_is_absolute: false
+      base_url: "https://www.bankofengland.co.uk"
+
+matching:
+  # Jobs scoring below this (0-1 scale) are dropped from results.
+  minimum_score: 0.35
+  top_n_per_scan: 10
+
+schedule:
+  morning_scan_time: "07:30"
+  evening_wrap_time: "18:30"
+  biweekly_analysis:
+    day_of_week: "Monday"
+    time: "08:00"
+    interval_weeks: 2
+
+paths:
+  skills_profile: "data/skills_profile.yaml"
+  base_cv: "data/base_cv.md"
+  applications_log: "data/applications.json"
+  output_dir: "output"

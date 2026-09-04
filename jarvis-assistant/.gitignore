@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+config/config.yaml
+data/skills_profile.yaml
+data/base_cv.md
+data/applications.json
+output/

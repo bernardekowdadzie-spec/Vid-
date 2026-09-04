@@ -1,0 +1,40 @@
+# Copy to skills_profile.yaml and fill in your real details.
+# This drives the job-matching score and gets fed to Claude for CV tailoring.
+
+full_name: "Your Name"
+current_title: "Your current job title"
+years_experience: 5
+locations:
+  - "London"
+  - "Remote (UK)"
+right_to_work_uk: true
+
+# Plain keywords/phrases describing what you can do. Be specific - "AML
+# transaction monitoring" scores better matches than just "compliance".
+skills:
+  - "financial regulation"
+  - "regulatory compliance"
+  - "risk management"
+  - "AML / KYC"
+  - "financial crime"
+  - "data analysis"
+  - "Python"
+  - "SQL"
+  - "stakeholder management"
+  - "policy analysis"
+  - "project management"
+
+qualifications:
+  - "BSc Economics"
+  - "CFA Level 2 (in progress)"
+
+# Job titles/seniority you're targeting - used as a light boost, not a hard filter.
+seniority_levels:
+  - "associate"
+  - "analyst"
+  - "manager"
+
+# If any of these appear in a job title/description, the job is skipped
+# entirely regardless of skill match (e.g. roles you're not eligible/interested in).
+excluded_keywords:
+  - "graduate scheme"
