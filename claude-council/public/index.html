@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Claude Council</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/vendor/marked.js"></script>
+    <script src="/vendor/purify.js"></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <h1>Claude Council</h1>
+      <p class="roster" id="roster"></p>
+      <button id="new-conversation">+ New conversation</button>
+      <ul id="conversation-list"></ul>
+    </aside>
+    <main>
+      <div id="messages" class="messages">
+        <div class="empty">
+          <h2>Ask the council</h2>
+          <p>
+            Every member answers on its own, then reviews the others' answers without knowing who wrote them. The
+            chairman reads it all and writes the final answer.
+          </p>
+        </div>
+      </div>
+      <form id="composer" class="composer">
+        <textarea id="input" rows="3" placeholder="Ask a question… (Enter to send, Shift+Enter for a new line)"></textarea>
+        <button type="submit" id="send">Send</button>
+      </form>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

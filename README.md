@@ -52,3 +52,7 @@ Found an issue with Remotion? [File an issue here](https://github.com/remotion-d
 ## License
 
 Note that for some entities a company license is needed. [Read the terms here](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md).
+
+## Claude Council
+
+`claude-council/` is a separate app in this repo. It sends your question to several Claude models, has them review each other's answers anonymously, and a chairman model writes the final answer. See [claude-council/README.md](claude-council/README.md).
